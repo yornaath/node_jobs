@@ -1,0 +1,15 @@
+{
+  "author": "Jørn Andre Tangen <jornandretangen@gmail.com>",
+  "name": "Jobs",
+  "description": "Running jobs \"ala cron\" in nodejs",
+  "version": "0.0.0",
+  "repository": {
+    "url": ""
+  },
+  "main": "./src/Jobs.js",
+  "engines": {
+    "node": "~0.6.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}

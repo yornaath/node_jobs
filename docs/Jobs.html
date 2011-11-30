@@ -1,0 +1,161 @@
+<!DOCTYPE html>  <html> <head>   <title>Jobs.js</title>   <meta http-equiv="content-type" content="text/html; charset=UTF-8">   <link rel="stylesheet" media="all" href="docco.css" /> </head> <body>   <div id="container">     <div id="background"></div>          <table cellpadding="0" cellspacing="0">       <thead>         <tr>           <th class="docs">             <h1>               Jobs.js             </h1>           </th>           <th class="code">           </th>         </tr>       </thead>       <tbody>                               <tr id="section-1">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-1">&#182;</a>               </div>               <h3>Imports</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">job_utils</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./utils.js&#39;</span><span class="p">),</span>
+    <span class="nx">classExtends</span> <span class="o">=</span> <span class="nx">job_utils</span><span class="p">.</span><span class="nx">classExtends</span><span class="p">,</span>
+    <span class="nx">parseTimeString</span> <span class="o">=</span> <span class="nx">job_utils</span><span class="p">.</span><span class="nx">parseTimeString</span><span class="p">;</span></pre></div>             </td>           </tr>                               <tr id="section-2">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-2">&#182;</a>               </div>               <h3>Decalarations</h3>             </td>             <td class="code">               <div class="highlight"><pre><span class="kd">var</span> <span class="nx">Job</span><span class="p">,</span> <span class="nx">Jobs</span><span class="p">;</span>
+
+
+<span class="nx">Job</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+
+  <span class="kd">var</span> <span class="nx">jid</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span>
+  <span class="kd">var</span> <span class="nx">states</span> <span class="o">=</span> <span class="p">{</span>
+    <span class="nx">awake</span><span class="o">:</span>      <span class="mi">0</span><span class="p">,</span>
+    <span class="nx">running</span><span class="o">:</span>    <span class="mi">1</span><span class="p">,</span>
+    <span class="nx">sleeping</span><span class="o">:</span>   <span class="mi">2</span><span class="p">,</span>
+    <span class="nx">finnished</span><span class="o">:</span>  <span class="mi">3</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-3">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-3">&#182;</a>               </div>               <h2>Job</h2>
+
+<p>Representation of the job   </p>
+
+<hr />
+
+<p><strong>name:</strong> String, name of the job <br />
+<strong>url:</strong> String, pointing to the script  </p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">Job</span> <span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s1">&#39;__constructed__&#39;</span><span class="p">)</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">name</span> <span class="o">=</span> <span class="nx">name</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">jid</span> <span class="o">=</span> <span class="nx">jid</span><span class="o">++</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">url</span> <span class="o">=</span> <span class="nx">url</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">persistent</span> <span class="o">=</span> <span class="kc">false</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">awake</span>
+    
+    <span class="k">this</span><span class="p">.</span><span class="nx">interval</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">timeout</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">scheduled_at_timestamp</span>
+  <span class="p">};</span></pre></div>             </td>           </tr>                               <tr id="section-4">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-4">&#182;</a>               </div>               <h3>Job.exposes</h3>
+
+<p>A jobs main methods exposes these 'suggars'</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">exposes</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">exec</span><span class="p">,</span> <span class="nx">args</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span> <span class="o">=</span> <span class="k">this</span>
+    <span class="k">return</span> <span class="p">{</span></pre></div>             </td>           </tr>                               <tr id="section-5">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-5">&#182;</a>               </div>               <h4>Job.exposes.now</h4>
+
+<p>runs the script in the url at invocation</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">now</span><span class="o">:</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+        <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+          <span class="nx">exec</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+        <span class="p">}).</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_job</span>
+      <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-6">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-6">&#182;</a>               </div>               <h4>Job.exposes.every</h4>
+
+<p>runs the script at a set intervall</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="nx">every</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">time_in_ms</span> <span class="o">=</span> <span class="nx">parseTimeString</span><span class="p">(</span><span class="nx">time</span><span class="p">);</span>
+        <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+          <span class="nx">_job</span><span class="p">.</span><span class="nx">interval</span> <span class="o">=</span> <span class="nx">setInterval</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">_job</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">exec</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+          <span class="p">},</span> <span class="nx">time_in_ms</span><span class="p">)</span>
+        <span class="p">}).</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_job</span>
+      <span class="p">},</span></pre></div>             </td>           </tr>                               <tr id="section-7">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-7">&#182;</a>               </div>               <h4>Job.exposes.in</h4>
+
+<p>runs the script once, some time in the future</p>             </td>             <td class="code">               <div class="highlight"><pre>      <span class="k">in</span><span class="o">:</span> <span class="kd">function</span><span class="p">(</span><span class="nx">time</span><span class="p">)</span> <span class="p">{</span>
+        <span class="kd">var</span> <span class="nx">time_in_ms</span> <span class="o">=</span> <span class="nx">parseTimeString</span><span class="p">(</span><span class="nx">time</span><span class="p">),</span>
+            <span class="nx">time_stamp</span> <span class="o">=</span> <span class="k">new</span> <span class="nb">Date</span><span class="p">().</span><span class="nx">getTime</span><span class="p">();</span>
+        <span class="k">this</span><span class="p">.</span><span class="nx">scheduled_at_timestamp</span> <span class="o">=</span> <span class="nx">time_stamp</span> <span class="o">+</span> <span class="nx">time_in_ms</span><span class="p">;</span>
+        <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+          <span class="nx">_job</span><span class="p">.</span><span class="nx">timeout</span> <span class="o">=</span> <span class="nx">setTimeout</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="nx">_job</span><span class="p">,</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+            <span class="nx">exec</span><span class="p">.</span><span class="nx">call</span><span class="p">(</span><span class="k">this</span><span class="p">)</span>
+            <span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">finnished</span>
+          <span class="p">},</span> <span class="nx">time_in_ms</span><span class="p">)</span>
+        <span class="p">}).</span><span class="nx">apply</span><span class="p">(</span><span class="k">this</span><span class="p">);</span>
+        <span class="k">return</span> <span class="nx">_job</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-8">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-8">&#182;</a>               </div>               <h3>Main methods</h3>
+
+<hr />             </td>             <td class="code">               <div class="highlight"><pre></pre></div>             </td>           </tr>                               <tr id="section-9">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-9">&#182;</a>               </div>               <h3>Job.run</h3>
+
+<p>Run the script at the url, when is determined by the exposes.method used</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">run</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+        <span class="nx">_job_arguments</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">exposes</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="kd">var</span> <span class="nx">_job_spec</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="nx">_job</span><span class="p">.</span><span class="nx">url</span><span class="p">)</span>
+      <span class="nx">_job_spec</span><span class="p">.</span><span class="nx">apply</span><span class="p">(</span><span class="nx">_job</span><span class="p">,</span> <span class="nx">_job_arguments</span><span class="p">)</span>
+      <span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">running</span>
+    <span class="p">})</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-10">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-10">&#182;</a>               </div>               <h3>Job.sleep</h3>
+
+<p>pauses the job</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">sleep</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+        <span class="nx">_job_arguments</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">exposes</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">sleeping</span>
+    <span class="p">})</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-11">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-11">&#182;</a>               </div>               <h3>Job.wake</h3>
+
+<p>wakes a sleeping job</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">wake</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+        <span class="nx">_job_arguments</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">;</span>
+    <span class="k">return</span> <span class="k">this</span><span class="p">.</span><span class="nx">exposes</span><span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+      <span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">awake</span>
+    <span class="p">})</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-12">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-12">&#182;</a>               </div>               <h3>Job.kill</h3>
+
+<p>kills the job, and prevents it from running</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">kill</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span> <span class="o">=</span> <span class="k">this</span><span class="p">,</span>
+        <span class="nx">_job_arguments</span> <span class="o">=</span> <span class="nx">arguments</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span> <span class="nx">clearInterval</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">interval</span><span class="p">)</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timeout</span><span class="p">)</span> <span class="nx">clearTimeout</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">timeout</span><span class="p">)</span>
+    <span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">=</span> <span class="nx">states</span><span class="p">.</span><span class="nx">finnished</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-13">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-13">&#182;</a>               </div>               <h3>Job.persist</h3>
+
+<p>persists the job in the database, TODO: have to provide adapters</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">persist</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">save</span><span class="p">(</span><span class="kd">function</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">err</span><span class="p">)</span> <span class="k">return</span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">error</span><span class="p">)</span>
+      <span class="k">this</span><span class="p">.</span><span class="nx">persistent</span> <span class="o">=</span> <span class="kc">true</span>
+    <span class="p">})</span>
+  <span class="p">}</span>
+
+  <span class="k">return</span> <span class="nx">Job</span>
+<span class="p">})();</span></pre></div>             </td>           </tr>                               <tr id="section-14">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-14">&#182;</a>               </div>               <h3>all_jobs</h3>
+
+<p>all jobs, indexed by jid</p>             </td>             <td class="code">               <div class="highlight"><pre><span class="nx">jobs</span> <span class="o">=</span> <span class="p">(</span><span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+  
+  <span class="kd">var</span> <span class="nx">all_jobs</span> <span class="o">=</span> <span class="p">{</span> <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-15">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-15">&#182;</a>               </div>               <h2>jobs</h2>
+
+<p>api for working with jobs   </p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="kd">function</span> <span class="nx">Jobs</span><span class="p">()</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">lol</span> <span class="o">=</span> <span class="s1">&#39;lol&#39;</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-16">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-16">&#182;</a>               </div>               <h3>jobs.persistenceAdapter</h3>
+
+<p>set the persistence adapter used to persist jobs</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Jobs</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">persistenceAdapter</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">adaptername</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">this</span><span class="p">.</span><span class="nx">persistenceadapter</span> <span class="o">=</span> <span class="nx">require</span><span class="p">(</span><span class="s1">&#39;./persistence_adapters/&#39;</span><span class="o">+</span><span class="nx">adaptername</span><span class="o">+</span><span class="s1">&#39;.js&#39;</span><span class="p">)</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-17">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-17">&#182;</a>               </div>               <h3>jobs.spawn</h3>
+
+<p>creates a new job and indexes it</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Jobs</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">spawn</span> <span class="o">=</span> <span class="kd">function</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">_job</span><span class="p">;</span>
+    <span class="k">if</span><span class="p">(</span><span class="k">this</span><span class="p">.</span><span class="nx">persistenceadapter</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">for</span><span class="p">(</span><span class="nx">method</span> <span class="k">in</span> <span class="k">this</span><span class="p">.</span><span class="nx">persistenceadapter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">)</span> <span class="p">{</span>
+        <span class="nx">Job</span><span class="p">.</span><span class="nx">prototype</span><span class="p">[</span><span class="nx">method</span><span class="p">]</span> <span class="o">=</span> <span class="k">this</span><span class="p">.</span><span class="nx">persistenceadapter</span><span class="p">.</span><span class="nx">prototype</span><span class="p">[</span><span class="nx">method</span><span class="p">]</span>
+      <span class="p">}</span>
+    <span class="p">}</span>
+    <span class="nx">_job</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Job</span><span class="p">(</span><span class="nx">name</span><span class="p">,</span> <span class="nx">url</span><span class="p">)</span>
+    <span class="nx">all_jobs</span><span class="p">[</span><span class="nx">_job</span><span class="p">.</span><span class="nx">jid</span><span class="p">]</span> <span class="o">=</span> <span class="nx">_job</span>
+    <span class="k">return</span> <span class="nx">all_jobs</span><span class="p">[</span><span class="nx">_job</span><span class="p">.</span><span class="nx">jid</span><span class="p">]</span>
+  <span class="p">}</span></pre></div>             </td>           </tr>                               <tr id="section-18">             <td class="docs">               <div class="pilwrap">                 <a class="pilcrow" href="#section-18">&#182;</a>               </div>               <h3>jobs.getRunning</h3>
+
+<p>returns all running jobs</p>             </td>             <td class="code">               <div class="highlight"><pre>  <span class="nx">Jobs</span><span class="p">.</span><span class="nx">prototype</span><span class="p">.</span><span class="nx">getRunning</span> <span class="o">=</span> <span class="kd">function</span><span class="p">()</span> <span class="p">{</span>
+    <span class="kd">var</span> <span class="nx">running_jobs</span> <span class="o">=</span> <span class="p">[</span> <span class="p">],</span> <span class="nx">_jid</span><span class="p">,</span> <span class="nx">_job</span>
+    <span class="k">for</span><span class="p">(</span><span class="nx">_jid</span> <span class="k">in</span> <span class="nx">all_jobs</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">_job</span> <span class="o">=</span> <span class="nx">all_jobs</span><span class="p">[</span><span class="nx">_jid</span><span class="p">]</span>
+      <span class="k">if</span><span class="p">(</span><span class="nx">_job</span><span class="p">.</span><span class="nx">state</span> <span class="o">==</span> <span class="nx">states</span><span class="p">.</span><span class="nx">running</span><span class="p">)</span> <span class="nx">running_jobs</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">_job</span><span class="p">)</span>
+    <span class="p">}</span>
+    <span class="k">return</span> <span class="nx">running_jobs</span>
+  <span class="p">}</span>
+
+
+  <span class="k">return</span> <span class="k">new</span> <span class="nx">Jobs</span>
+<span class="p">})();</span>
+
+
+
+
+<span class="nx">jobs</span><span class="p">.</span><span class="nx">persistenceAdapter</span><span class="p">(</span><span class="s1">&#39;mongodb&#39;</span><span class="p">)</span>
+<span class="kd">var</span> <span class="nx">j</span> <span class="o">=</span> <span class="nx">jobs</span><span class="p">.</span><span class="nx">spawn</span><span class="p">(</span><span class="s1">&#39;logger&#39;</span><span class="p">,</span> <span class="s1">&#39;../examplejobs/logger.js&#39;</span><span class="p">)</span>
+
+<span class="nx">j</span><span class="p">.</span><span class="nx">run</span><span class="p">().</span><span class="nx">every</span><span class="p">(</span><span class="s1">&#39;2second&#39;</span><span class="p">).</span><span class="nx">persist</span><span class="p">()</span>
+
+</pre></div>             </td>           </tr>                </tbody>     </table>   </div> </body> </html> 
