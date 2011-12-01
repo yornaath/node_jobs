@@ -29,6 +29,7 @@ var parseTimeString = function(){
       pair,
       converted_to_ms;
     if(typeof time == 'number') return time
+    if(typeof time == 'object' && !/[a-z]/.test(time)) return parseFloat(time)
     value_unit_strings = time.split(/\s/)
     pairs = []
     for (i = value_unit_strings.length - 1; i >= 0; i--) {

@@ -29,13 +29,14 @@ Job = (function() {
     this.url = undef
     this.jid = jid++
     this.persistent = false
+    this.persisted = false
     this.state = states.awake
     
     this.interval = undef
     this.timeout = undef
     this.scheduled_at_timestamp = undef
     this.scheduled_for_every = undef
-    
+
     // populate job if spec is provided
     for(value in spec) {
       this[value] = spec[value]
@@ -53,6 +54,7 @@ Job = (function() {
         (function() {
           exec.call(this)
         }).apply(_job);
+        if(_job.persistent) _job.save()
         return _job
       },
       // #### Job.exposes.every
@@ -65,6 +67,7 @@ Job = (function() {
           }, time_in_ms);
         }).apply(_job);
         _job.scheduled_for_every = time_in_ms
+        if(_job.persistent) _job.save()
         return _job
       },
       // #### Job.exposes.in
@@ -79,6 +82,7 @@ Job = (function() {
           }, time_in_ms)
         }).apply(_job);
         _job.scheduled_at_timestamp = time_stamp + time_in_ms;
+        if(_job.persistent) _job.save()
         return _job
       }
     }
@@ -130,15 +134,6 @@ Job = (function() {
     _job.state = states.finnished
   }
 
-  // ### Job.persist
-  // persists the job in the database, TODO: have to provide adapters
-  Job.prototype.persist = function() {
-    this.save(function(err) {
-      if(err) return console.log(err)
-      this.persistent = true
-    })
-  }
-
   Job.prototype.generateDbRepresentation = function() {
     return {
       name: this.name,
@@ -165,9 +160,11 @@ jobs = (function() {
 
   // ### jobs.persistenceAdapter
   // set the persistence adapter used to persist jobs
-  Jobs.prototype.persistenceAdapter = function(name) {
-    this.persistenceadapterClass = require(name+'_adapter')
-    this.persistenceadapter = new this.persistenceadapterClass
+  Jobs.prototype.persistenceAdapter = function(type, host, database, port, options) {
+    this.persistenceadapterClass = require(type+'_adapter')
+    this.persistenceadapter = new this.persistenceadapterClass()
+    this.persistenceadapter.connect(host, database, port, options)
+    return this
   }
 
   Jobs.prototype.resumeOnRestart = function() {
@@ -176,6 +173,7 @@ jobs = (function() {
       for (var i = jobs.length - 1; i >= 0; i--) {
         var _jobspec = jobs[i]
         var _job = new Job(_jobspec)
+        console.log(_job)
         if(_job.state == states.running) {
           if(_job.scheduled_for_every) {
             _job.run().every(_job.scheduled_for_every)
@@ -187,19 +185,37 @@ jobs = (function() {
         }
       };
     })
+    return this
   }
 
   // ### jobs.spawn
   // creates a new job and indexes it
   Jobs.prototype.spawn = function(spec) {
     var _job;
-    if(this.persistenceadapterClass) {
-      Job.prototype.save = this.persistenceadapterClass.prototype.save
-      Job.prototype.destroy = this.persistenceadapterClass.prototype.destroy 
-    }
     _job = new Job(spec)
     all_jobs[_job.jid] = _job
     return all_jobs[_job.jid]
+  }
+
+  Jobs.prototype.spawnPersistent = function(spec) {
+    var _job;
+    if(this.persistenceadapter) {
+      var pa = this.persistenceadapter 
+      Job.prototype.save = function() {
+        pa.save(this, function(err, job) {
+          if(err) return console.log(err)
+          all_jobs[job.jid] = job
+        })
+      }
+      Job.prototype.destroy = function() {
+        pa.destroy(this, function(err, job) {
+          if(err) return console.log(err)
+        })
+      }
+    }
+    _job = new Job(spec)
+    _job.persistent = true
+    return _job
   }
 
   // ### jobs.getRunning
@@ -220,11 +236,13 @@ jobs = (function() {
 
 
 
-jobs.persistenceAdapter('mongodb')
-jobs.resumeOnRestart()
-//var j = jobs.spawn('logger', '../examplejobs/logger.js')
-
-//j.run().every('2second').persist()
+jobs.persistenceAdapter('mongodb', 'mongodb://localhost/jobs')
+    .resumeOnRestart()
+    .spawnPersistent({
+      name: 'logger', 
+      url: '../examplejobs/logger.js'
+    })
+    .run().every('2second')
 
 //console.log(j.generateDbRepresentation())
 
