@@ -5,7 +5,7 @@ var job_utils = require('./utils.js'),
 
 
 // ### Decalarations
-var Job, Jobs, states;
+var Job, Jobs, states, undef = undefined;
 
 states = {
   awake:      0,
@@ -25,16 +25,18 @@ Job = (function() {
   // **name:** String, name of the job  
   // **url:** String, pointing to the script  
   function Job (spec) {
-    this.name 
-    this.url 
+    this.name = undef
+    this.url = undef
     this.jid = jid++
     this.persistent = false
     this.state = states.awake
     
-    this.interval
-    this.timeout
-    this.scheduled_at_timestamp
-    this.scheduled_for_every
+    this.interval = undef
+    this.timeout = undef
+    this.scheduled_at_timestamp = undef
+    this.scheduled_for_every = undef
+    
+    // populate job if spec is provided
     for(value in spec) {
       this[value] = spec[value]
     }

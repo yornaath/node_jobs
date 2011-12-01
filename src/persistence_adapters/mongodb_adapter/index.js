@@ -3,16 +3,17 @@ var mongoose = require('mongoose')
   , Schema = mongoose.Schema
   , ObjectId = Schema.ObjectId
 
-  name: this.name,
-      url: this.url,
-      state: this.state,
-      scheduled_for_every: this.scheduled_for_every,
-      scheduled_at_timestamp: this.scheduled_at_timestamp,
 
 var Adapter = (function() {
 
   function Adapter() {
-    this.model = mongoose.model('Jobspec', new Schema({
+    this.connection = undefined
+    this.model = undefined
+  }
+
+  Adapter.prototype.connect = function(host, database, port, options) {
+    this.connection = mongoose.createConnection(host, database, port, options)
+    this.model = this.connection.model('Jobspec', new Schema({
       url:                    {type: String},
       state:                  {type: String},
       scheduled_at_timestamp: {type: Number},
