@@ -152,8 +152,6 @@ Job = (function() {
 // all jobs, indexed by jid
 jobs = (function() {
   
-  var all_jobs = { }
-
   // ## jobs
   // api for working with jobs   
   function Jobs() {}
@@ -193,8 +191,7 @@ jobs = (function() {
   Jobs.prototype.spawn = function(spec) {
     var _job;
     _job = new Job(spec)
-    all_jobs[_job.jid] = _job
-    return all_jobs[_job.jid]
+    return _job
   }
 
   Jobs.prototype.spawnPersistent = function(spec) {
@@ -217,18 +214,6 @@ jobs = (function() {
     _job.persistent = true
     return _job
   }
-
-  // ### jobs.getRunning
-  // returns all running jobs
-  Jobs.prototype.getRunning = function() {
-    var running_jobs = [ ], _jid, _job
-    for(_jid in all_jobs) {
-      _job = all_jobs[_jid]
-      if(_job.state == states.running) running_jobs.push(_job)
-    }
-    return running_jobs
-  }
-
 
   return new Jobs
 })();
