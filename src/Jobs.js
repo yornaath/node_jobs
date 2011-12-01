@@ -1,7 +1,10 @@
 // ### Imports
-var job_utils = require('./utils.js'),
+
+var util = require('util'),
+    job_utils = require('./utils.js'),
     classExtends = job_utils.classExtends,
     parseTimeString = job_utils.parseTimeString;
+
 
 
 // ### Decalarations
@@ -38,7 +41,9 @@ Job = (function() {
     this.scheduled_for_every = undef
 
     // populate job if spec is provided
-    for(value in spec) {
+    if(typeof spec == 'string') this.url = spec
+    if(typeof spec == 'function') this.url = spec
+    if(typeof spec == 'object') for(value in spec) {
       this[value] = spec[value]
     }
   };
@@ -99,7 +104,9 @@ Job = (function() {
         _job_arguments = arguments;
     _job.state = states.running
     return this.exposes(function() {
-      var _job_spec = require(_job.url)
+      var _job_spec
+      if(typeof _job.url == 'function') _job_spec = _job.url
+      if(typeof _job.url == 'string') _job_spec = require(_job.url)
       _job_spec.apply(_job, _job_arguments)
     })
   }
@@ -148,8 +155,7 @@ Job = (function() {
 })();
 
 
-// ### all_jobs
-// all jobs, indexed by jid
+
 jobs = (function() {
   
   // ## jobs
@@ -171,7 +177,6 @@ jobs = (function() {
       for (var i = jobs.length - 1; i >= 0; i--) {
         var _jobspec = jobs[i]
         var _job = new Job(_jobspec)
-        console.log(_job)
         if(_job.state == states.running) {
           if(_job.scheduled_for_every) {
             _job.run().every(_job.scheduled_for_every)
@@ -201,7 +206,6 @@ jobs = (function() {
       Job.prototype.save = function() {
         pa.save(this, function(err, job) {
           if(err) return console.log(err)
-          all_jobs[job.jid] = job
         })
       }
       Job.prototype.destroy = function() {
@@ -219,17 +223,7 @@ jobs = (function() {
 })();
 
 
-
-
-jobs.persistenceAdapter('mongodb', 'mongodb://localhost/jobs')
-    .resumeOnRestart()
-    .spawnPersistent({
-      name: 'logger', 
-      url: '../examplejobs/logger.js'
-    })
-    .run().every('2second')
-
-//console.log(j.generateDbRepresentation())
+module.exports = jobs
 
 
 
