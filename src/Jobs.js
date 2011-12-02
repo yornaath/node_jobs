@@ -19,7 +19,7 @@ states = {
 
 Job = (function() {
 
-  var jid = 0;
+  var jid = 11;
 
   // ## Job
   // Representation of the job   
@@ -61,7 +61,7 @@ Job = (function() {
           exec.call(this)
         }).apply(_job);
         if(_job.persistent) _job.save()
-        return _job
+        return _job.jid
       },
       // #### Job.exposes.every
       // runs the script at a set intervall
@@ -74,7 +74,7 @@ Job = (function() {
         }).apply(_job);
         _job.scheduled_for_every = time_in_ms
         if(_job.persistent) _job.save()
-        return _job
+        return _job.jid
       },
       // #### Job.exposes.after
       // runs the script once, some time in the future
@@ -89,7 +89,7 @@ Job = (function() {
         }).apply(_job);
         _job.scheduled_at_timestamp = time_stamp + time_in_ms;
         if(_job.persistent) _job.save()
-        return _job
+        return _job.jid
       }
     }
   }
@@ -168,6 +168,8 @@ Job = (function() {
 
 jobs = (function() {
   
+  var jid_job_index = {}
+
   // ## jobs
   // api for working with jobs   
   function Jobs() {}
@@ -206,7 +208,8 @@ jobs = (function() {
   Jobs.prototype.spawn = function(spec) {
     var _job;
     _job = new Job(spec)
-    return _job
+    jid_job_index[_job.jid] = _job
+    return jid_job_index[_job.jid]
   }
 
   Jobs.prototype.spawnPersistent = function(spec) {
@@ -227,6 +230,12 @@ jobs = (function() {
     _job = new Job(spec)
     _job.persistent = true
     return _job
+  }
+
+  Jobs.prototype.getById = function(jid, fn){
+    var _job = jid_job_index[jid]
+    if(!_job) return fn.call(this, 'no job with id: '+jid, null)
+    fn.call(this, false, _job)
   }
 
   return new Jobs
