@@ -77,9 +77,9 @@ Job = (function() {
         if(_job.persistent) _job.save()
         return _job
       },
-      // #### Job.exposes.in
+      // #### Job.exposes.after
       // runs the script once, some time in the future
-      in: function(time) {
+      after: function(time) {
         var time_in_ms = parseTimeString(time),
             time_stamp = new Date().getTime();
         (function() {
@@ -134,8 +134,8 @@ Job = (function() {
         _job_arguments = arguments;
     return this.exposes(function() {
       if (_job.state !== states.sleeping) return
-      if(_job.scheduled_at_timestamp) _job.run(_job.runarguments).in(_job.scheduled_at_timestamp)
-      if(_job.scheduled_for_every) _job.run(_job.runarguments).every(scheduled_for_every)
+      if(_job.scheduled_at_timestamp) _job.run(_job.runarguments).after(_job.scheduled_at_timestamp)
+      if(_job.scheduled_for_every) _job.run.apply(_job, _job.runarguments).every(_job.scheduled_for_every)
       _job.state = states.awake
     })
   }
@@ -145,9 +145,11 @@ Job = (function() {
   Job.prototype.kill = function() {
     var _job = this,
         _job_arguments = arguments;
-    if(this.interval) clearInterval(this.interval)
-    if(this.timeout) clearTimeout(this.timeout)
-    _job.state = states.finnished
+    return this.exposes(function() {
+      if(_job.interval) clearInterval(_job.interval)
+      if(_job.timeout) clearTimeout(_job.timeout)
+      _job.state = states.finnished
+    })
   }
 
   Job.prototype.generateDbRepresentation = function() {
@@ -191,8 +193,8 @@ jobs = (function() {
             _job.run().every(_job.scheduled_for_every)
           }
           if(_job.scheduled_at_timestamp) {
-            var when = _job.scheduled_at_timestamp - (new Date().getTime());
-            _job.run().in(when)
+            var timeelapsed = _job.scheduled_at_timestamp - (new Date().getTime());
+            _job.run().after(timeelapsed)
           }
         }
       };
@@ -230,6 +232,13 @@ jobs = (function() {
 
   return new Jobs
 })();
+
+
+j = jobs.spawn('../examplejobs/logger.js')
+        .run('looool')
+        .every('1second')
+
+j.kill().after('4second')
 
 
 module.exports = jobs
