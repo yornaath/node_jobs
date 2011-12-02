@@ -30,6 +30,8 @@ Job = (function() {
   function Job (spec) {
     this.name = undef
     this.url = undef
+    this.name = udef
+    this.url = udef
     this.jid = jid++
     this.persistent = false
     this.persisted = false
