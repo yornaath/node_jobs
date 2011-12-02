@@ -5,7 +5,6 @@ var util = require('util'),
     classExtends = job_utils.classExtends,
     parseTimeString = job_utils.parseTimeString;
 
-console.log(process.env)
 require.paths = require.main.paths
 
 // ### Decalarations
