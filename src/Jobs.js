@@ -8,7 +8,7 @@ var util = require('util'),
 
 
 // ### Decalarations
-var Job, Jobs, states, undef = undefined;
+var Job, Jobs, states, udef = undefined;
 
 states = {
   awake:      0,
@@ -28,8 +28,6 @@ Job = (function() {
   // **name:** String, name of the job  
   // **url:** String, pointing to the script  
   function Job (spec) {
-    this.name = undef
-    this.url = undef
     this.name = udef
     this.url = udef
     this.jid = jid++
@@ -37,10 +35,12 @@ Job = (function() {
     this.persisted = false
     this.state = states.awake
     
-    this.interval = undef
-    this.timeout = undef
-    this.scheduled_at_timestamp = undef
-    this.scheduled_for_every = undef
+    this.interval = udef
+    this.timeout = udef
+    this.scheduled_at_timestamp = udef
+    this.scheduled_for_every = udef
+
+    this.runarguments = udef
 
     // populate job if spec is provided
     if(typeof spec == 'string') this.url = spec
@@ -105,6 +105,7 @@ Job = (function() {
     var _job = this,
         _job_arguments = arguments;
     _job.state = states.running
+    _job.runarguments = _job_arguments
     return this.exposes(function() {
       var _job_spec
       if(typeof _job.url == 'function') _job_spec = _job.url
@@ -119,7 +120,10 @@ Job = (function() {
     var _job = this,
         _job_arguments = arguments;
     return this.exposes(function() {
-      _job.state = states.sleeping
+      if (_job.state !== states.running) return
+      if(this.interval) clearInterval(this.interval)
+      if(this.timeout) clearTimeout(this.timeout)
+      _job.state = states.sleeping 
     })
   }
 
@@ -129,6 +133,9 @@ Job = (function() {
     var _job = this,
         _job_arguments = arguments;
     return this.exposes(function() {
+      if (_job.state !== states.sleeping) return
+      if(_job.scheduled_at_timestamp) _job.run(_job.runarguments).in(_job.scheduled_at_timestamp)
+      if(_job.scheduled_for_every) _job.run(_job.runarguments).every(scheduled_for_every)
       _job.state = states.awake
     })
   }
