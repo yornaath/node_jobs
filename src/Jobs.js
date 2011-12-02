@@ -5,8 +5,9 @@ var util = require('util'),
     classExtends = job_utils.classExtends,
     parseTimeString = job_utils.parseTimeString;
 
+console.log(process.env)
+require.paths = require.main.paths
 
-console.log(util.inspect(require.main))
 // ### Decalarations
 var Job, Jobs, states, udef = undefined;
 
@@ -16,7 +17,6 @@ states = {
   sleeping:   2,
   finnished:  3
 }
-
 
 Job = (function() {
 
