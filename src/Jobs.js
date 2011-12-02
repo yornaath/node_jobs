@@ -175,7 +175,7 @@ jobs = (function() {
   // ### jobs.persistenceAdapter
   // set the persistence adapter used to persist jobs
   Jobs.prototype.persistenceAdapter = function(type, host, database, port, options) {
-    this.persistenceadapterClass = require(type+'_adapter')
+    this.persistenceadapterClass = require(__dirname+'/persistence_adapters/'+type+'_adapter')
     this.persistenceadapter = new this.persistenceadapterClass()
     this.persistenceadapter.connect(host, database, port, options)
     return this
