@@ -5,6 +5,8 @@ var util = require('util'),
     classExtends = job_utils.classExtends,
     parseTimeString = job_utils.parseTimeString;
 
+
+console.log(util.inspect(require.main))
 // ### Decalarations
 var Job, Jobs, states, udef = undefined;
 
@@ -231,12 +233,6 @@ jobs = (function() {
   return new Jobs
 })();
 
-
-j = jobs.spawn('../examplejobs/logger.js')
-        .run('looool')
-        .every('1second')
-
-j.kill().after('4second')
 
 
 module.exports = jobs
