@@ -5,8 +5,6 @@ var util = require('util'),
     classExtends = job_utils.classExtends,
     parseTimeString = job_utils.parseTimeString;
 
-
-
 // ### Decalarations
 var Job, Jobs, states, udef = undefined;
 
